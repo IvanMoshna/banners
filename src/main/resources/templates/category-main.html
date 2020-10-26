@@ -1,8 +1,16 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Categories</title>
+    <div class="container mt-5 mb-5">
+        <form action="/category" method="post">
+            <input type="text" name="name" placeholder="Enter the name" class="form-control"><br>
+            <input type="text" name="req_name" placeholder="Enter the req_name" class="form-control"><br>
+            <button type="submit" class="btn btn-succes">Save</button>
+        </form>
+    </div>
 </head>
 <body>
 
