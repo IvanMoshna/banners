@@ -6,5 +6,32 @@
 </head>
 <body>
 <p th:text="'Hello, ' + ${title} + '!'" />
+
+<div class="col-md-5 mb-3">
+    <a href="/banner" class="btn">Add new banner</a>
+    <style>
+        .btn {
+            display: inline-block; /* Строчно-блочный элемент */
+            background: #8C959D; /* Серый цвет фона */
+            color: #fff; /* Белый цвет текста */
+            padding: 1rem 1.5rem; /* Поля вокруг текста */
+            text-decoration: none; /* Убираем подчёркивание */
+            border-radius: 3px; /* Скругляем уголки */
+        }
+    </style>
+</div>
+<div class="col-md-5 mb-3">
+    <a href="/category" class="btn">Add new category</a>
+    <style>
+        .btn {
+            display: inline-block; /* Строчно-блочный элемент */
+            background: #8C959D; /* Серый цвет фона */
+            color: #fff; /* Белый цвет текста */
+            padding: 1rem 1.5rem; /* Поля вокруг текста */
+            text-decoration: none; /* Убираем подчёркивание */
+            border-radius: 3px; /* Скругляем уголки */
+        }
+    </style>
+</div>
 </body>
 </html>
