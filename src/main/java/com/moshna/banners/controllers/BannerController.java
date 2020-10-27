@@ -7,14 +7,12 @@ import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class BannerController {
@@ -30,6 +28,13 @@ public class BannerController {
 
     @GetMapping("/banner")
     public String categoryMain(Model model) {
+        //нужно выводить все баннеры
+        Iterable<Banner> banners = bannerRepository.findAll();
+        Collection<Banner> bannersList = new ArrayList<>();
+        for (Banner b: banners) {
+            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(), b.getCategoryID(), b.getText(), b.isDeleted()));
+        }
+
         Iterable<Category> categories = categoryRepository.findAll();
         Collection<Category> categoryList = new ArrayList<>();
         for (Category item : categories) {
@@ -37,7 +42,7 @@ public class BannerController {
         }
 
         model.addAttribute("categories", categoryList);
-        model.addAttribute("banner", "Banners");
+        model.addAttribute("banners", bannersList);
         return "banner-main";
     }
 
@@ -49,6 +54,15 @@ public class BannerController {
         bannerRepository.save(banner);
 
         return "redirect:/";
+    }
+
+    @GetMapping("/banner/{id}")
+    public String bannerDetails(@PathVariable(value = "id") long id, Model model) {
+        Optional<Banner> banner = bannerRepository.findById(id);
+        ArrayList<Banner> ban = new ArrayList<>();
+        banner.ifPresent(ban::add);
+        model.addAttribute("banner", ban);
+        return "banner-main";
     }
 
 }

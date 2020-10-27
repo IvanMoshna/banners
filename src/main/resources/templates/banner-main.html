@@ -8,8 +8,23 @@
 </head>
 <body>
     <header th:insert="blocks/header :: header"></header>
+<div class="row">
+    <div class="col-md-4 order-md-1 mb-1">
+        <h4 class="d-flex justify-content-between align-items-upper mb-3">
+            <span class="text-muted">Your banners</span>
+            <span class="badge badge-secondary badge-pill">3</span>
+        </h4>
+        <ul class="list-group mb-3" th:each="banner : ${banners}">
+            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                <div>
+                    <h6 class="nav-item" th:text="${banner.name}"></h6>
+                </div>
+            </li>
+        </ul>
+    </div>
 
-    <div class="container mt-5 mb-5">
+
+    <div class="container order-md-2 mt-5 mb-5">
         <form action="/banner" method="post">
             <input type="text" name="name" placeholder="Enter the name" class="form-control" required><br>
             <input type="double" name="price" placeholder="Enter the price" class="form-control" required><br>
@@ -25,8 +40,12 @@
             <textarea name="text" placeholder="Enter the text" class="form-control" required></textarea><br>
             <button type="submit" class="btn btn-succes">Save</button>
         </form>
-    </div>
 
+
+
+
+    </div>
+</div>
 <body>
 
 </body>
