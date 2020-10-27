@@ -1,14 +1,23 @@
 <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Banners</title>
     <div class="container mt-5 mb-5">
         <form action="/banner" method="post">
-            <input type="text" name="name" placeholder="Enter the name" class="form-control"><br>
-            <input type="double" name="price" placeholder="Enter the price" class="form-control"><br>
-            <input type="Long" name="categoryID" placeholder="сделать выборку из существующих категорий" class="form-control"><br>
-            <textarea name="text" placeholder="Enter the text" class="form-control"></textarea><br>
+            <input type="text" name="name" placeholder="Enter the name" class="form-control" required><br>
+            <input type="double" name="price" placeholder="Enter the price" class="form-control" required><br>
+            <div class="form-group blu-margin">
+                <select class="form-control" required>
+                    <option value="0">Select category</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category}"
+                            th:text="${category.name}">
+                    </option>
+                </select>
+            </div>
+            <textarea name="text" placeholder="Enter the text" class="form-control" required></textarea><br>
             <button type="submit" class="btn btn-succes">Save</button>
         </form>
     </div>
