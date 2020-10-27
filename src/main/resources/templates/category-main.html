@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Categories</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<body>
+    <header th:insert="blocks/header :: header"></header>
     <div class="container mt-5 mb-5">
         <form action="/category" method="post">
             <input type="text" name="name" placeholder="Enter the name" class="form-control" required><br>
@@ -12,7 +15,6 @@
         </form>
     </div>
 </head>
-<body>
 
 </body>
 </html>
