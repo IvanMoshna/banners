@@ -42,10 +42,10 @@ public class BannerController {
     }
 
     @PostMapping("/banner")
-    public String bannerPostAdd(@RequestParam String name, @RequestParam double price, @ModelAttribute Category category,
+    public String bannerPostAdd(@RequestParam String name, @RequestParam double price, @RequestParam Long categoryID,
                                 @RequestParam String text, Model model) {
 
-        Banner banner = new Banner(name, price, category.getId(), text);
+        Banner banner = new Banner(name, price, categoryID , text);
         bannerRepository.save(banner);
 
         return "redirect:/";

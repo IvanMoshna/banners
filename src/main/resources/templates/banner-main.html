@@ -14,10 +14,10 @@
             <input type="text" name="name" placeholder="Enter the name" class="form-control" required><br>
             <input type="double" name="price" placeholder="Enter the price" class="form-control" required><br>
             <div class="form-group blu-margin">
-                <select class="form-control" required>
-                    <option value="0">Select category</option>
+                <select name="categoryID" class="form-control" required>
+                    <option value="">Select category</option>
                     <option th:each="category : ${categories}"
-                            th:value="${category}"
+                            th:value="${category.id}"
                             th:text="${category.name}">
                     </option>
                 </select>
