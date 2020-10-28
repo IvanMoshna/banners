@@ -1,5 +1,6 @@
 package com.moshna.banners.controller;
 
+import com.moshna.banners.model.Banner;
 import com.moshna.banners.model.Category;
 import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,20 @@ public class CategoryController {
         }
 
         model.addAttribute("categories", categoryList);
-        model.addAttribute("categorySelected", category);
+        model.addAttribute("categoryDetails", category);
         return "category-details";
     }
+
+    @PostMapping("/category/{id}")
+    public String categoryPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
+                                     @RequestParam String req_name, Model model) {
+        Category category = categoryRepository.findById(id).orElseThrow();
+        category.setName(name);
+        category.setReq_name(req_name);
+
+        categoryRepository.save(category);
+
+        return "redirect:/category";
+    }
+
 }
