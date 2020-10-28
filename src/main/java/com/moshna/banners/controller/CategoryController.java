@@ -1,7 +1,6 @@
-package com.moshna.banners.controllers;
+package com.moshna.banners.controller;
 
-import com.moshna.banners.models.Banner;
-import com.moshna.banners.models.Category;
+import com.moshna.banners.model.Category;
 import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

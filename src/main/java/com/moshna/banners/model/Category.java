@@ -1,4 +1,4 @@
-package com.moshna.banners.models;
+package com.moshna.banners.model;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
