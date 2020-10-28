@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <header th:insert="blocks/header :: header"></header>
+<header th:insert="blocks/header :: header"></header>
 <div class="row">
     <div class="col-md-4 order-md-1 mb-1">
         <h4 class="d-flex justify-content-between align-items-upper mb-3">
@@ -18,7 +18,7 @@
             <li class="list-group-item d-flex justify-content-between lh-condensed">
                 <div>
                     <h6 class="nav-item" th:text="${banner.name}"></h6>
-                    <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning">Details</a>
+                    <a th:href="'/banner-main/' + ${banner.id}" class="btn btn-warning">Details</a>
                 </div>
             </li>
         </ul>
@@ -27,18 +27,18 @@
 
     <div class="container order-md-2 mt-5 mb-5">
         <form action="/banner" method="post">
-            <input type="text" name="name" placeholder="Enter the name" class="form-control" required><br>
-            <input type="double" name="price" placeholder="Enter the price" class="form-control" required><br>
+            <input type="text" name="name"  th:text="${bannerDetails.name}" class="form-control" required><br>
+            <input type="double" name="price" th:text="${bannerDetails.getPrice()}" class="form-control" required><br>
             <div class="form-group blu-margin">
                 <select name="categoryID" class="form-control" required>
-                    <option value="">Select category</option>
+                    <option th:text="${categorySelected.name}"></option>
                     <option th:each="category : ${categories}"
                             th:value="${category.id}"
                             th:text="${category.name}">
                     </option>
                 </select>
             </div>
-            <textarea name="text" placeholder="Enter the text" class="form-control" required></textarea><br>
+            <textarea name="text" th:text="${bannerDetails.getText()}" class="form-control" required></textarea><br>
             <div>
                 <button type="submit" class="btn btn-secondary">Save</button>
                 <button type="submit" class="btn btn-secondary">Delete</button>
