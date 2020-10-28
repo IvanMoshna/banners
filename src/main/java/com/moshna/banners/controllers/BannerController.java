@@ -58,6 +58,10 @@ public class BannerController {
 
     @GetMapping("/banner/{id}")
     public String bannerDetails(@PathVariable(value = "id") long id, Model model) {
+        if(!bannerRepository.existsById(id)) {
+            return "redirect:/";
+        }
+
         Optional<Banner> banner = bannerRepository.findById(id);
         ArrayList<Banner> ban = new ArrayList<>();
         banner.ifPresent(ban::add);
@@ -91,6 +95,21 @@ public class BannerController {
         model.addAttribute("banners", bannersList);
         model.addAttribute("bannerDetails", bannerDetail);
         return "banner-details";
+    }
+
+    @PostMapping("/banner/{id}")
+    public String bannerPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
+                                   @RequestParam double price, @RequestParam Long categoryID,
+                                   @RequestParam String text, Model model) {
+        Banner banner = bannerRepository.findById(id).orElseThrow();
+        banner.setName(name);
+        banner.setPrice(price);
+        banner.setCategoryID(categoryID);
+        banner.setText(text);
+
+        bannerRepository.save(banner);
+
+        return "redirect:/banner";
     }
 
 }

@@ -13,16 +13,36 @@
         <h4 class="d-flex justify-content-between align-items-upper mb-3">
             <span class="text-muted">Your banners</span>
         </h4>
-        <input class="form-control mr-sm-2 mb-3" type="text" placeholder="Search" aria-label="Search">
+        <input class="input" type="text" placeholder="Search" aria-label="Search">
         <ul class="list-group mb-3" th:each="banner : ${banners}">
             <li class="list-group-item d-flex justify-content-between lh-condensed">
                 <div>
-                    <h6 class="nav-item" th:text="${banner.name}"></h6>
+                    <h6 class="item visible" th:text="${banner.name}"></h6>
                     <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning">Details</a>
                 </div>
             </li>
         </ul>
     </div>
+
+
+    <script>
+        const input = document.querySelector('.input');
+        const li = [...document.querySelectorAll('.item')]
+
+        input.addEventListener('input', (event) => {
+            console.log(event.target.value)
+
+            li.forEach(item => {
+                if (item.innerText.indexOf(event.target.value) === 0) {
+                    item.classList.add('visible');
+                    item.classList.remove('invisible')
+                } else {
+                    item.classList.remove('visible');
+                    item.classList.add('invisible')
+                }
+            })
+        })
+    </script>
 
 
     <div class="container order-md-2 mt-5 mb-5">
