@@ -2,6 +2,7 @@ package com.moshna.banners.controller;
 
 import com.moshna.banners.model.Banner;
 import com.moshna.banners.model.Category;
+import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -20,12 +22,23 @@ public class CategoryController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+    private BannerRepository bannerRepository;
 
+    public CategoryController(CategoryRepository categoryRepository, BannerRepository bannerRepository) {
+        this.bannerRepository = bannerRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @GetMapping("/category")
     public String categoryMain(Model model) {
         Iterable<Category> categories = categoryRepository.findAll();
-        model.addAttribute("categories", categories);
+        Collection<Category> categoryList = new ArrayList<>();
+        for (Category item : categories) {
+            if(!item.isDeleted()) {
+                categoryList.add(new Category(item.getId(), item.getName(), item.getReq_name(), item.isDeleted()));
+            }
+        }
+        model.addAttribute("categories", categoryList);
         return "category-main";
     }
 
@@ -69,5 +82,34 @@ public class CategoryController {
 
         return "redirect:/category";
     }
+
+    @PostMapping("/category/{id}/remove")
+    public String categoryPostRemove(@PathVariable(value = "id") long id, Model model) {
+        List<Long> notDeletedBannersID = new ArrayList<>();
+        Category category = categoryRepository.findById(id).orElseThrow();
+
+
+        Iterable<Banner> banners = bannerRepository.findAll();
+        Collection<Banner> bannersList = new ArrayList<>();
+        for (Banner b: banners) {
+            if(b.getCategoryID() == id && !b.isDeleted()) {
+                notDeletedBannersID.add(b.getId());
+            }
+        }
+
+        if(!notDeletedBannersID.isEmpty()) {
+            //TODO:ошибка с айдишниками баннеров
+        }
+        else {
+            category.setDeleted(true);
+            categoryRepository.save(category);
+        }
+
+
+
+        return "redirect:/category";
+    }
+
+
 
 }

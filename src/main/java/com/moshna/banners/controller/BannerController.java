@@ -25,6 +25,8 @@ public class BannerController {
         this.categoryRepository = categoryRepository;
     }
 
+    //TODO: сделать методы вытаскивания всех категорий и баннеров
+
     @GetMapping("/banner")
     public String categoryMain(Model model) {
 
