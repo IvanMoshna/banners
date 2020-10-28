@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,24 +26,57 @@ public class BannerController {
         this.categoryRepository = categoryRepository;
     }
 
-    //TODO: сделать методы вытаскивания всех категорий и баннеров
+    //TODO: возможно их лучше куда нибудь переместить?
+    public List<Banner> GetAllBanners() {
+        Iterable<Banner> banners = bannerRepository.findAll();
+        List<Banner> bannersList = new ArrayList<>();
+        for (Banner b : banners) {
+            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                    b.getCategoryID(), b.getText(), b.isDeleted()));
+        }
+        return bannersList;
+    }
+    public List<Banner> GetNotDeletedBanner() {
+        Iterable<Banner> banners = bannerRepository.findAll();
+        List<Banner> bannersList = new ArrayList<>();
+        for (Banner b : banners) {
+            if(!b.isDeleted()) {
+                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                        b.getCategoryID(), b.getText(), b.isDeleted()));
+            }
+        }
+        return bannersList;
+    }
+    public List<Category> GetAllCategories() {
+        Iterable<Category> categories = categoryRepository.findAll();
+        List<Category> categoriesList = new ArrayList<>();
+        for (Category b : categories) {
+            categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+        }
+        return categoriesList;
+    }
+    public List<Category> GetNotDeletedCategories() {
+        Iterable<Category> categories = categoryRepository.findAll();
+        List<Category> categoriesList = new ArrayList<>();
+        for (Category b : categories) {
+            if(!b.isDeleted()) {
+                categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+            }
+        }
+        return categoriesList;
+    }
+
+    @GetMapping("/home")
+    public String goHome()
+    {
+        return "home";
+    }
 
     @GetMapping("/banner")
     public String categoryMain(Model model) {
 
-        Iterable<Banner> banners = bannerRepository.findAll();
-        Collection<Banner> bannersList = new ArrayList<>();
-        for (Banner b: banners) {
-            if(!b.isDeleted()) {
-                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(), b.getCategoryID(), b.getText(), b.isDeleted()));
-            }
-        }
-
-        Iterable<Category> categories = categoryRepository.findAll();
-        Collection<Category> categoryList = new ArrayList<>();
-        for (Category item : categories) {
-            categoryList.add(new Category(item.getId(), item.getName(), item.getReq_name(), item.isDeleted()));
-        }
+        List<Banner> bannersList = GetNotDeletedBanner();
+        List<Category> categoryList = GetNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
@@ -65,33 +99,11 @@ public class BannerController {
             return "redirect:/";
         }
 
-        Optional<Banner> banner = bannerRepository.findById(id);
-        ArrayList<Banner> ban = new ArrayList<>();
-        banner.ifPresent(ban::add);
+        Banner bannerDetail = bannerRepository.findById(id).orElseThrow();
+        Category category = categoryRepository.findById(bannerDetail.getCategoryID()).orElseThrow();
 
-
-        Iterable<Banner> banners = bannerRepository.findAll();
-        Collection<Banner> bannersList = new ArrayList<>();
-        for (Banner b: banners) {
-                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                        b.getCategoryID(), b.getText(), b.isDeleted()));
-        }
-
-        //TODO: убрать этот костыль
-        Banner bannerDetail = new Banner(ban.get(0).getId(), ban.get(0).getName(), ban.get(0).getPrice(),
-                ban.get(0).getCategoryID(), ban.get(0).getText(), ban.get(0).isDeleted());
-
-        Optional<Category> categoryOptList = categoryRepository.findById(bannerDetail.getCategoryID());
-        ArrayList<Category> catList = new ArrayList<>();
-        categoryOptList.ifPresent(catList::add);
-        Category category = new Category(catList.get(0).getId(), catList.get(0).getName(),
-                catList.get(0).getReq_name(), catList.get(0).isDeleted());
-
-        Iterable<Category> categories = categoryRepository.findAll();
-        Collection<Category> categoryList = new ArrayList<>();
-        for (Category item : categories) {
-            categoryList.add(new Category(item.getId(), item.getName(), item.getReq_name(), item.isDeleted()));
-        }
+        List<Banner> bannersList = GetNotDeletedBanner();
+        List<Category> categoryList = GetNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("categorySelected", category);

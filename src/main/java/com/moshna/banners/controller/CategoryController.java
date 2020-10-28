@@ -29,15 +29,49 @@ public class CategoryController {
         this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping("/category")
-    public String categoryMain(Model model) {
-        Iterable<Category> categories = categoryRepository.findAll();
-        Collection<Category> categoryList = new ArrayList<>();
-        for (Category item : categories) {
-            if(!item.isDeleted()) {
-                categoryList.add(new Category(item.getId(), item.getName(), item.getReq_name(), item.isDeleted()));
+    //TODO: возможно их лучше куда нибудь переместить?
+    public List<Banner> GetAllBanners() {
+        Iterable<Banner> banners = bannerRepository.findAll();
+        List<Banner> bannersList = new ArrayList<>();
+        for (Banner b : banners) {
+            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                    b.getCategoryID(), b.getText(), b.isDeleted()));
+        }
+        return bannersList;
+    }
+    public List<Banner> GetNotDeletedBanner() {
+        Iterable<Banner> banners = bannerRepository.findAll();
+        List<Banner> bannersList = new ArrayList<>();
+        for (Banner b : banners) {
+            if(!b.isDeleted()) {
+                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                        b.getCategoryID(), b.getText(), b.isDeleted()));
             }
         }
+        return bannersList;
+    }
+    public List<Category> GetAllCategories() {
+        Iterable<Category> categories = categoryRepository.findAll();
+        List<Category> categoriesList = new ArrayList<>();
+        for (Category b : categories) {
+            categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+        }
+        return categoriesList;
+    }
+    public List<Category> GetNotDeletedCategories() {
+        Iterable<Category> categories = categoryRepository.findAll();
+        List<Category> categoriesList = new ArrayList<>();
+        for (Category b : categories) {
+            if(!b.isDeleted()) {
+                categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+            }
+        }
+        return categoriesList;
+    }
+
+    @GetMapping("/category")
+    public String categoryMain(Model model) {
+        List<Category> categoryList = GetNotDeletedCategories();
         model.addAttribute("categories", categoryList);
         return "category-main";
     }
@@ -51,20 +85,8 @@ public class CategoryController {
 
     @GetMapping("/category/{id}")
     public String bannerDetails(@PathVariable(value = "id") long id, Model model) {
-        Optional<Category> categoryOptional = categoryRepository.findById(id);
-        ArrayList<Category> categoryArrayList = new ArrayList<>();
-        categoryOptional.ifPresent(categoryArrayList::add);
-
-        //TODO: пофиксить тот же костыль
-        Category category = new Category(categoryArrayList.get(0).getId(), categoryArrayList.get(0).getName(),
-                categoryArrayList.get(0).getReq_name(), categoryArrayList.get(0).isDeleted());
-
-
-        Iterable<Category> categories = categoryRepository.findAll();
-        Collection<Category> categoryList = new ArrayList<>();
-        for (Category item : categories) {
-            categoryList.add(new Category(item.getId(), item.getName(), item.getReq_name(), item.isDeleted()));
-        }
+        Category category = categoryRepository.findById(id).orElseThrow();
+        List<Category> categoryList = GetNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("categoryDetails", category);
@@ -106,7 +128,7 @@ public class CategoryController {
         }
 
 
-
+        model.addAttribute("notDeleted", notDeletedBannersID);
         return "redirect:/category";
     }
 
