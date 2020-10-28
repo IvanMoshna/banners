@@ -32,7 +32,9 @@ public class BannerController {
         Iterable<Banner> banners = bannerRepository.findAll();
         Collection<Banner> bannersList = new ArrayList<>();
         for (Banner b: banners) {
-            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(), b.getCategoryID(), b.getText(), b.isDeleted()));
+            if(!b.isDeleted()) {
+                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(), b.getCategoryID(), b.getText(), b.isDeleted()));
+            }
         }
 
         Iterable<Category> categories = categoryRepository.findAll();
@@ -70,11 +72,11 @@ public class BannerController {
         Iterable<Banner> banners = bannerRepository.findAll();
         Collection<Banner> bannersList = new ArrayList<>();
         for (Banner b: banners) {
-            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                    b.getCategoryID(), b.getText(), b.isDeleted()));
+                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                        b.getCategoryID(), b.getText(), b.isDeleted()));
         }
 
-        //TODO: убрать этот костыль, поправить фронт(там не в полях значения выводятся)
+        //TODO: убрать этот костыль
         Banner bannerDetail = new Banner(ban.get(0).getId(), ban.get(0).getName(), ban.get(0).getPrice(),
                 ban.get(0).getCategoryID(), ban.get(0).getText(), ban.get(0).isDeleted());
 
@@ -112,4 +114,11 @@ public class BannerController {
         return "redirect:/banner";
     }
 
+    @PostMapping("/banner/{id}/remove")
+    public String bannerPostDelete(@PathVariable(value = "id") long id, Model model) {
+        Banner banner = bannerRepository.findById(id).orElseThrow();
+        banner.setDeleted(true);
+        bannerRepository.save(banner);
+        return "redirect:/banner";
+    }
 }

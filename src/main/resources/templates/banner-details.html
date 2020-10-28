@@ -41,13 +41,16 @@
             <textarea name="text" th:text="${bannerDetails.getText()}" class="form-control" required></textarea><br>
             <div>
                 <button type="submit" class="btn btn-secondary">Update</button>
-                <button type="submit" class="btn btn-secondary">Delete</button>
+
             </div>
+        </form>
+        <form th:action="'/banner/' + ${bannerDetails.id} +'/remove'" method="post">
+            <button type="submit" class="btn btn-secondary">Delete</button>
         </form>
 
     </div>
 </div>
-<body>
+
 
 </body>
 </html>
