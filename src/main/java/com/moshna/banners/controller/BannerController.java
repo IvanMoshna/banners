@@ -7,12 +7,14 @@ import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 @Controller
 public class BannerController {
@@ -84,13 +86,20 @@ public class BannerController {
     }
 
     @PostMapping("/banner")
-    public String bannerPostAdd(@RequestParam String name, @RequestParam double price, @RequestParam Long categoryID,
-                                @RequestParam String text, Model model) {
+    public String bannerPostAdd(@Valid Banner banner,
+                                BindingResult bindingResult,
+                                Model model) {
 
-        Banner banner = new Banner(name, price, categoryID , text);
-        bannerRepository.save(banner);
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
 
-        return "redirect:/";
+            model.mergeAttributes(errorsMap);
+
+        } else {
+            bannerRepository.save(banner);
+        }
+
+        return "redirect:/banner";
     }
 
     @GetMapping("/banner/{id}")

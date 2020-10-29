@@ -2,20 +2,22 @@ package com.moshna.banners.controller;
 
 import com.moshna.banners.model.Banner;
 import com.moshna.banners.model.Category;
+import com.moshna.banners.model.Request;
 import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.client.HttpStatusCodeException;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 public class CategoryController {
@@ -130,6 +132,58 @@ public class CategoryController {
 
         model.addAttribute("notDeleted", notDeletedBannersID);
         return "redirect:/category";
+    }
+
+    @GetMapping("/category/{req_name}")
+    public String getBannerText(@PathVariable(value = "req_name") String req_name, Model model,
+                                HttpServletResponse response) {
+        //TODO: реализация пункта получения текста баннера по URL определенного вида
+        List<Category> categories = GetNotDeletedCategories();
+        List<Banner> banners = GetNotDeletedBanner();
+        List<Banner> bannersWithCatID = new ArrayList<>();
+        for (Category c: categories) {
+            if(c.getReq_name() == req_name) {
+                for (Banner b: banners) {
+                    if(b.getCategoryID() == c.getId()){
+                        bannersWithCatID.add(b);
+                    }
+                }
+            }
+        }
+
+        //ищем с максимальным прайсом
+        if(!bannersWithCatID.isEmpty()) {
+            Banner bannerWithMaxPrice = bannersWithCatID.get(0);
+            for (Banner b : bannersWithCatID) {
+                if (b.getPrice() >= bannerWithMaxPrice.getPrice()) {
+                    bannerWithMaxPrice = b;
+                }
+            }
+
+            //TODO: вывод текста на экран
+
+
+
+
+            //TODO:проверка ip и даты
+            String ip_address = "";
+            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+            Date date = new Date(System.currentTimeMillis());
+
+
+            Request request = new Request(bannerWithMaxPrice.getId(), bannerWithMaxPrice.getText(),
+                                            ip_address, date);
+
+
+        }
+        else {
+            //TODO: вернуть HTTP status 204
+            //return response.setStatus(HttpStatus.NO_CONTENT);
+        }
+
+
+        //TODO: тут же реализация последнего пункта и создание записи в базу REQUEST
+        return "redirect:/";
     }
 
 

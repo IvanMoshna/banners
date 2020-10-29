@@ -1,9 +1,8 @@
 package com.moshna.banners.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+
 
 @Entity
 public class Banner {
@@ -11,9 +10,17 @@ public class Banner {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+
+
+    @NotBlank(message = "Please fill the unique name")
+    @Column(unique = true, nullable = false)
     private String name;
+    @Column(nullable = false)
     private double price;
+    @Column(nullable = false)
     private Long categoryID;
+    @Column(nullable = false)
     private String text;
     private boolean deleted;
 

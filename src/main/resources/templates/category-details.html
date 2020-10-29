@@ -32,7 +32,15 @@
         </form>
         <form th:action="'/category/' + ${categoryDetails.id} +'/remove'" method="post">
             <button type="submit" class="btn btn-secondary">Delete</button>
-            <input type="text" name="notDeletedBanners" th:value="${notDeleted}" class="form-control"><br>
+            <div class="form-group">
+                <input type="text" class="form-control ${(textError??)?string('is-invalid', '')}"
+                       value="<#if message??>${notDeleted}</#if>" name="text" placeholder="Введите сообщение" />
+                <#if textError??>
+                <div class="invalid-feedback">
+                    ${textError}
+                </div>
+                </#if>
+            </div>
         </form>
     </div>
 

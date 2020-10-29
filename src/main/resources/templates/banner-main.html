@@ -14,15 +14,40 @@
             <span class="text-muted">Your banners</span>
         </h4>
         <input id="input" class="input" type="text" placeholder="Search" aria-label="Search">
-        <ul class="list-group mb-3" th:each="banner : ${banners}">
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
+        <ul  th:each="banner : ${banners}">
+            <li>
                 <div>
-                    <h6 class="item visible" th:text="${banner.name}"></h6>
+                    <h6 th:text="${banner.name}"></h6>
                     <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning">Details</a>
                 </div>
             </li>
         </ul>
+        <script>
+            window.onload = () => {
+                let input = document.querySelector('#input');
+                input.oninput = function () {
+                    let value = this.value.trim();
+                    let list = document.querySelectorAll('.ul li');
+
+                    if(value != "") {
+                        list.forEach(elem => {
+                            if(elem.innerText.search(value) == -1) {
+                                elem.classList.add('hide');
+                            }
+                        });
+                    } else {
+                        list.forEach(elem => {
+                            elem.classList.remove('hide');
+                        });
+                    }
+
+                    console.log(this.value)
+                };
+            };
+        </script>
     </div>
+
+
 
     <div class="container order-md-2 mt-5 mb-5">
         <form action="/banner" method="post">
@@ -47,5 +72,4 @@
 </div>
 
     </body>
-<script src="main.js"></script>
 </html>
