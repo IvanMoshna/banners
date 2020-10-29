@@ -13,37 +13,40 @@
         <h4 class="d-flex justify-content-between align-items-upper mb-3">
             <span class="text-muted">Your banners</span>
         </h4>
-        <input id="input" class="input" type="text" placeholder="Search" aria-label="Search">
+        <style>
+            .visible {
+                display: block;
+            }
+
+            .invisible {
+                display: none;
+            }
+        </style>
+        <input id="input" class="input" type="text" placeholder="Search" aria-label="Search"><br>
         <ul  th:each="banner : ${banners}">
-            <li>
-                <div>
-                    <h6 th:text="${banner.name}"></h6>
-                    <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning">Details</a>
-                </div>
+            <li class="item visible">
+                    <!--<h6 th:text="${banner.name}"></h6>-->
+                <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning" th:text="${banner.name}"></a><br>
             </li>
+
         </ul>
         <script>
-            window.onload = () => {
-                let input = document.querySelector('#input');
-                input.oninput = function () {
-                    let value = this.value.trim();
-                    let list = document.querySelectorAll('.ul li');
+            const input = document.querySelector('.input');
+            const li = [...document.querySelectorAll('.item')]
 
-                    if(value != "") {
-                        list.forEach(elem => {
-                            if(elem.innerText.search(value) == -1) {
-                                elem.classList.add('hide');
-                            }
-                        });
+            input.addEventListener('input', (event) => {
+                console.log(event.target.value)
+
+                li.forEach(item => {
+                    if (item.innerText.toLowerCase().indexOf(event.target.value.toLowerCase())  !== -1) {
+                        item.classList.add('visible');
+                        item.classList.remove('invisible')
                     } else {
-                        list.forEach(elem => {
-                            elem.classList.remove('hide');
-                        });
+                        item.classList.remove('visible');
+                        item.classList.add('invisible')
                     }
-
-                    console.log(this.value)
-                };
-            };
+                })
+            })
         </script>
     </div>
 
@@ -65,6 +68,11 @@
             <textarea name="text" placeholder="Enter the text" class="form-control" required></textarea><br>
             <div>
                 <button type="submit" class="btn btn-secondary">Save</button>
+            </div>
+            <div class="form-group">
+                <!--<input type="text" th:text="${test} class="form-control ${(textError??)?string('is-invalid', '')}"
+                       name="text" placeholder="Введите сообщение" />-->
+
             </div>
         </form>
 

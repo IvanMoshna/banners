@@ -4,6 +4,7 @@ import com.moshna.banners.model.Banner;
 import com.moshna.banners.model.Category;
 import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
+import com.moshna.banners.service.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -79,9 +80,10 @@ public class BannerController {
 
         List<Banner> bannersList = GetNotDeletedBanner();
         List<Category> categoryList = GetNotDeletedCategories();
-
+        String abc = "";
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
+        model.addAttribute("test" , abc);
         return "banner-main";
     }
 
@@ -89,16 +91,17 @@ public class BannerController {
     public String bannerPostAdd(@Valid Banner banner,
                                 BindingResult bindingResult,
                                 Model model) {
-
+        String message ="";
 
         try {
             bannerRepository.save(banner);
         } catch (Exception e) {
             //TODO:вывести ошибку
-            return "redirect:/banner";
+            message = "validation error";
+
         }
 
-
+        model.addAttribute("validationMessage", message);
         return "redirect:/banner";
     }
 

@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <title>Banners</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .visible {
+            display: block;
+        }
+
+        .invisible {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 <header th:insert="blocks/header :: header"></header>
@@ -14,14 +23,30 @@
             <span class="text-muted">Your banners</span>
         </h4>
         <input class="input" type="text" placeholder="Search" aria-label="Search">
-        <ul class="list-group mb-3" th:each="banner : ${banners}">
-            <li class="list-group-item d-flex justify-content-between lh-condensed">
-                <div>
-                    <h6 class="item visible" th:text="${banner.name}"></h6>
-                    <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning">Details</a>
-                </div>
+        <ul th:each="banner : ${banners}">
+            <li class="item visible">
+                <!--<h6 th:text="${banner.name}"></h6>-->
+                <a th:href="'/banner/' + ${banner.id}" class="btn btn-warning" th:text="${banner.name}"></a><br>
             </li>
         </ul>
+        <script>
+            const input = document.querySelector('.input');
+            const li = [...document.querySelectorAll('.item')]
+
+            input.addEventListener('input', (event) => {
+                console.log(event.target.value)
+
+                li.forEach(item => {
+                    if (item.innerText.toLowerCase().indexOf(event.target.value.toLowerCase())  !== -1) {
+                        item.classList.add('visible');
+                        item.classList.remove('invisible')
+                    } else {
+                        item.classList.remove('visible');
+                        item.classList.add('invisible')
+                    }
+                })
+            })
+        </script>
     </div>
 
 

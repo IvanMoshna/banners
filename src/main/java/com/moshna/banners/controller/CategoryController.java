@@ -5,16 +5,15 @@ import com.moshna.banners.model.Category;
 import com.moshna.banners.model.Request;
 import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
+import com.moshna.banners.repo.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -25,10 +24,14 @@ public class CategoryController {
     @Autowired
     private CategoryRepository categoryRepository;
     private BannerRepository bannerRepository;
+    private RequestRepository requestRepository;
 
-    public CategoryController(CategoryRepository categoryRepository, BannerRepository bannerRepository) {
+    public CategoryController(CategoryRepository categoryRepository,
+                              BannerRepository bannerRepository,
+                              RequestRepository requestRepository) {
         this.bannerRepository = bannerRepository;
         this.categoryRepository = categoryRepository;
+        this.requestRepository = requestRepository;
     }
 
     //TODO: возможно их лучше куда нибудь переместить?
@@ -135,7 +138,10 @@ public class CategoryController {
     }
 
     @GetMapping("/category={req_name}")
-    public String getBannerText(@PathVariable(value = "req_name") String req_name, Model model,
+    public String getBannerText(@PathVariable(value = "req_name") String req_name,
+                                @RequestHeader(value = "User-Agent") String userAgent,
+                                HttpServletRequest requestIP,
+                                Model model,
                                 HttpServletResponse response) {
         //TODO: реализация пункта получения текста баннера по URL определенного вида
         List<Category> categories = GetNotDeletedCategories();
@@ -164,25 +170,24 @@ public class CategoryController {
                 }
             }
             soughtBannerText = bannerWithMaxPrice.getText();
-            //TODO: вывод текста на экран
-
-
 
 
             //TODO:проверка ip и даты
-            String ip_address = "";
+
+
+
             SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
             Date date = new Date(System.currentTimeMillis());
 
 
-            Request request = new Request(bannerWithMaxPrice.getId(), bannerWithMaxPrice.getText(),
-                                            ip_address, date);
-
+            Request request = new Request(bannerWithMaxPrice.getId(), userAgent,
+                                            requestIP.getRemoteAddr(), date);
+            requestRepository.save(request);
 
         }
         else {
             //TODO: вернуть HTTP status 204
-            //return response.setStatus(HttpStatus.NO_CONTENT);
+            return "redirect:/HttpStatus.NO_CONTENT";
         }
 
 
