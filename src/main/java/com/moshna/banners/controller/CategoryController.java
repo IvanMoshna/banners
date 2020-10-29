@@ -86,7 +86,7 @@ public class CategoryController {
     }
 
     @GetMapping("/category/{id}")
-    public String bannerDetails(@PathVariable(value = "id") long id, Model model) {
+    public String categoryDetails(@PathVariable(value = "id") long id, Model model) {
         Category category = categoryRepository.findById(id).orElseThrow();
         List<Category> categoryList = GetNotDeletedCategories();
 
@@ -134,15 +134,19 @@ public class CategoryController {
         return "redirect:/category";
     }
 
-    @GetMapping("/category/{req_name}")
+    @GetMapping("/category={req_name}")
     public String getBannerText(@PathVariable(value = "req_name") String req_name, Model model,
                                 HttpServletResponse response) {
         //TODO: реализация пункта получения текста баннера по URL определенного вида
         List<Category> categories = GetNotDeletedCategories();
         List<Banner> banners = GetNotDeletedBanner();
         List<Banner> bannersWithCatID = new ArrayList<>();
+        String soughtBannerText = "";
+
+
         for (Category c: categories) {
-            if(c.getReq_name() == req_name) {
+            String nameReq = c.getReq_name();
+            if(c.getReq_name().equals(req_name)) {
                 for (Banner b: banners) {
                     if(b.getCategoryID() == c.getId()){
                         bannersWithCatID.add(b);
@@ -159,7 +163,7 @@ public class CategoryController {
                     bannerWithMaxPrice = b;
                 }
             }
-
+            soughtBannerText = bannerWithMaxPrice.getText();
             //TODO: вывод текста на экран
 
 
@@ -183,7 +187,9 @@ public class CategoryController {
 
 
         //TODO: тут же реализация последнего пункта и создание записи в базу REQUEST
-        return "redirect:/";
+
+        model.addAttribute("bannerText", soughtBannerText);
+        return "bannerText";
     }
 
 

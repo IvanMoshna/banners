@@ -90,14 +90,14 @@ public class BannerController {
                                 BindingResult bindingResult,
                                 Model model) {
 
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
 
-            model.mergeAttributes(errorsMap);
-
-        } else {
+        try {
             bannerRepository.save(banner);
+        } catch (Exception e) {
+            //TODO:вывести ошибку
+            return "redirect:/banner";
         }
+
 
         return "redirect:/banner";
     }

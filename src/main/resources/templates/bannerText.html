@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BannerText</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<body>
+<header th:insert="blocks/header :: header"></header>
+    <div>
+        <h6 class="nav-item" th:text="${bannerText}"></h6>
+    </div>
+</body>
+</html>
