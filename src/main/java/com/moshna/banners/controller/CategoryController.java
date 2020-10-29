@@ -6,6 +6,7 @@ import com.moshna.banners.model.Request;
 import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
 import com.moshna.banners.repo.RequestRepository;
+import com.moshna.banners.service.MainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -21,62 +22,24 @@ import java.util.*;
 @Controller
 public class CategoryController {
 
-    @Autowired
     private CategoryRepository categoryRepository;
     private BannerRepository bannerRepository;
     private RequestRepository requestRepository;
+    private MainService mainService;
 
     public CategoryController(CategoryRepository categoryRepository,
                               BannerRepository bannerRepository,
-                              RequestRepository requestRepository) {
+                              RequestRepository requestRepository,
+                              MainService mainService) {
         this.bannerRepository = bannerRepository;
         this.categoryRepository = categoryRepository;
         this.requestRepository = requestRepository;
-    }
-
-    //TODO: возможно их лучше куда нибудь переместить?
-    public List<Banner> GetAllBanners() {
-        Iterable<Banner> banners = bannerRepository.findAll();
-        List<Banner> bannersList = new ArrayList<>();
-        for (Banner b : banners) {
-            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                    b.getCategoryID(), b.getText(), b.isDeleted()));
-        }
-        return bannersList;
-    }
-    public List<Banner> GetNotDeletedBanner() {
-        Iterable<Banner> banners = bannerRepository.findAll();
-        List<Banner> bannersList = new ArrayList<>();
-        for (Banner b : banners) {
-            if(!b.isDeleted()) {
-                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                        b.getCategoryID(), b.getText(), b.isDeleted()));
-            }
-        }
-        return bannersList;
-    }
-    public List<Category> GetAllCategories() {
-        Iterable<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesList = new ArrayList<>();
-        for (Category b : categories) {
-            categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
-        }
-        return categoriesList;
-    }
-    public List<Category> GetNotDeletedCategories() {
-        Iterable<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesList = new ArrayList<>();
-        for (Category b : categories) {
-            if(!b.isDeleted()) {
-                categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
-            }
-        }
-        return categoriesList;
+        this.mainService = mainService;
     }
 
     @GetMapping("/category")
     public String categoryMain(Model model) {
-        List<Category> categoryList = GetNotDeletedCategories();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
         model.addAttribute("categories", categoryList);
         return "category-main";
     }
@@ -91,7 +54,7 @@ public class CategoryController {
     @GetMapping("/category/{id}")
     public String categoryDetails(@PathVariable(value = "id") long id, Model model) {
         Category category = categoryRepository.findById(id).orElseThrow();
-        List<Category> categoryList = GetNotDeletedCategories();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("categoryDetails", category);
@@ -143,9 +106,9 @@ public class CategoryController {
                                 HttpServletRequest requestIP,
                                 Model model,
                                 HttpServletResponse response) {
-        //TODO: реализация пункта получения текста баннера по URL определенного вида
-        List<Category> categories = GetNotDeletedCategories();
-        List<Banner> banners = GetNotDeletedBanner();
+
+        List<Category> categories = mainService.getNotDeletedCategories();
+        List<Banner> banners = mainService.getNotDeletedBanner();
         List<Banner> bannersWithCatID = new ArrayList<>();
         String soughtBannerText = "";
 

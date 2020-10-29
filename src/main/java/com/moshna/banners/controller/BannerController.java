@@ -20,54 +20,18 @@ import javax.validation.Valid;
 @Controller
 public class BannerController {
 
-    @Autowired
     private final BannerRepository bannerRepository;
     private final CategoryRepository categoryRepository;
+    private final MainService mainService;
 
-    public BannerController(BannerRepository bannerRepository, CategoryRepository categoryRepository) {
+    public BannerController(BannerRepository bannerRepository,
+                            CategoryRepository categoryRepository,
+                            MainService mainService) {
         this.bannerRepository = bannerRepository;
         this.categoryRepository = categoryRepository;
+        this.mainService = mainService;
     }
 
-    //TODO: возможно их лучше куда нибудь переместить?
-    public List<Banner> GetAllBanners() {
-        Iterable<Banner> banners = bannerRepository.findAll();
-        List<Banner> bannersList = new ArrayList<>();
-        for (Banner b : banners) {
-            bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                    b.getCategoryID(), b.getText(), b.isDeleted()));
-        }
-        return bannersList;
-    }
-    public List<Banner> GetNotDeletedBanner() {
-        Iterable<Banner> banners = bannerRepository.findAll();
-        List<Banner> bannersList = new ArrayList<>();
-        for (Banner b : banners) {
-            if(!b.isDeleted()) {
-                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                        b.getCategoryID(), b.getText(), b.isDeleted()));
-            }
-        }
-        return bannersList;
-    }
-    public List<Category> GetAllCategories() {
-        Iterable<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesList = new ArrayList<>();
-        for (Category b : categories) {
-            categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
-        }
-        return categoriesList;
-    }
-    public List<Category> GetNotDeletedCategories() {
-        Iterable<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesList = new ArrayList<>();
-        for (Category b : categories) {
-            if(!b.isDeleted()) {
-                categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
-            }
-        }
-        return categoriesList;
-    }
 
     @GetMapping("/home")
     public String goHome()
@@ -78,8 +42,8 @@ public class BannerController {
     @GetMapping("/banner")
     public String categoryMain(Model model) {
 
-        List<Banner> bannersList = GetNotDeletedBanner();
-        List<Category> categoryList = GetNotDeletedCategories();
+        List<Banner> bannersList = mainService.getNotDeletedBanner();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
         String abc = "";
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
@@ -114,8 +78,8 @@ public class BannerController {
         Banner bannerDetail = bannerRepository.findById(id).orElseThrow();
         Category category = categoryRepository.findById(bannerDetail.getCategoryID()).orElseThrow();
 
-        List<Banner> bannersList = GetNotDeletedBanner();
-        List<Category> categoryList = GetNotDeletedCategories();
+        List<Banner> bannersList = mainService.getNotDeletedBanner();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("categorySelected", category);
