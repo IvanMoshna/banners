@@ -27,6 +27,8 @@ public class CategoryController {
     private RequestRepository requestRepository;
     private MainService mainService;
 
+    SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+
     public CategoryController(CategoryRepository categoryRepository,
                               BannerRepository bannerRepository,
                               RequestRepository requestRepository,
@@ -109,6 +111,7 @@ public class CategoryController {
 
         List<Category> categories = mainService.getNotDeletedCategories();
         List<Banner> banners = mainService.getNotDeletedBanner();
+        List<Request> requests = mainService.getAllRequest();
         List<Banner> bannersWithCatID = new ArrayList<>();
         String soughtBannerText = "";
 
@@ -118,48 +121,91 @@ public class CategoryController {
             if(c.getReq_name().equals(req_name)) {
                 for (Banner b: banners) {
                     if(b.getCategoryID() == c.getId()){
-                        bannersWithCatID.add(b);
+                        bannersWithCatID.add(b);//баннеры с выбранной категорией
                     }
                 }
             }
         }
 
         //ищем с максимальным прайсом
-        if(!bannersWithCatID.isEmpty()) {
-            Banner bannerWithMaxPrice = bannersWithCatID.get(0);
-            for (Banner b : bannersWithCatID) {
-                if (b.getPrice() >= bannerWithMaxPrice.getPrice()) {
-                    bannerWithMaxPrice = b;
+        /*if(!bannersWithCatID.isEmpty()) {
+
+            Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
+            if(!requests.isEmpty()) {
+                for (Request r: requests) {
+                    Date dateNow = new Date(System.currentTimeMillis());
+                    Long milliseconds = r.getDateTime().getTime() - dateNow.getTime();
+                    int days = (int) (milliseconds / (24 * 60 * 60 * 1000));
+                    if(r.getBanner_Id() == bannerWithMaxPrice.getId() &&
+                    r.getUser_agent().equals(userAgent) &&
+                    r.getIp_address() == requestIP.getRemoteAddr() &&
+                    days>=1) {
+                        bannersWithCatID.remove(bannerWithMaxPrice);
+
+                    }
                 }
-            }
+            }*/
+        if(check(bannersWithCatID, requests, userAgent, requestIP) && !bannersWithCatID.isEmpty()) {
+
+            Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
             soughtBannerText = bannerWithMaxPrice.getText();
 
-
-            //TODO:проверка ip и даты
-
-
-
-            SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
             Date date = new Date(System.currentTimeMillis());
-
-
             Request request = new Request(bannerWithMaxPrice.getId(), userAgent,
                                             requestIP.getRemoteAddr(), date);
             requestRepository.save(request);
 
+            model.addAttribute("bannerText", soughtBannerText);
+            return "bannerText";
         }
         else {
-            //TODO: вернуть HTTP status 204
-            return "redirect:/HttpStatus.NO_CONTENT";
+            response.setStatus(204);
+            return "category-main";
         }
 
 
-        //TODO: тут же реализация последнего пункта и создание записи в базу REQUEST
-
-        model.addAttribute("bannerText", soughtBannerText);
-        return "bannerText";
     }
 
+    public Banner getBannerWithMaxPrice(List<Banner> bannersWithCatID)
+    {
+        Banner bannerWithMaxPrice = bannersWithCatID.get(0);
+        for (Banner b : bannersWithCatID) {
+            if (b.getPrice() >= bannerWithMaxPrice.getPrice()) {
+                bannerWithMaxPrice = b;
+            }
+        }
+        return bannerWithMaxPrice;
+    }
+
+    public boolean check(List<Banner> bannersWithCatID, List<Request> requests,
+                         String userAgent, HttpServletRequest requestIP ) {
+        //boolean isOk;
+        if (!bannersWithCatID.isEmpty()) {
 
 
+            if (!requests.isEmpty()) {
+                for (Request r : requests) {
+                    Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
+                    Date dateNow = new Date(System.currentTimeMillis());
+                    Long milliseconds = dateNow.getTime() - r.getDateTime().getTime();
+                    int days = (int) (milliseconds / (24 * 60 * 60 * 1000));
+                    if (r.getBanner_Id() == bannerWithMaxPrice.getId() &&
+                            r.getUser_agent().equals(userAgent) &&
+                            r.getIp_address().equals(requestIP.getRemoteAddr()) &&
+                            days < 1) {
+                        bannersWithCatID.remove(bannerWithMaxPrice);
+                        continue;
+                    }
+                    else {
+                        continue;
+                    }
+                }
+            }
+            return true;
+        }
+       else{
+           return  false;
+        }
+
+    }
 }

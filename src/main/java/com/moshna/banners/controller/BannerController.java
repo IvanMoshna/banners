@@ -47,7 +47,6 @@ public class BannerController {
         String abc = "";
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
-        model.addAttribute("test" , abc);
         return "banner-main";
     }
 
@@ -55,6 +54,8 @@ public class BannerController {
     public String bannerPostAdd(@Valid Banner banner,
                                 BindingResult bindingResult,
                                 Model model) {
+        List<Banner> bannersList = mainService.getNotDeletedBanner();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
         String message ="";
 
         try {
@@ -64,9 +65,10 @@ public class BannerController {
             message = "validation error";
 
         }
-
+        model.addAttribute("banners", bannersList);
+        model.addAttribute("categories", categoryList);
         model.addAttribute("validationMessage", message);
-        return "redirect:/banner";
+        return "banner-main";
     }
 
     @GetMapping("/banner/{id}")
