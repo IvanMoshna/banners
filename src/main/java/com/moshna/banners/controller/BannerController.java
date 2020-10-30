@@ -60,8 +60,8 @@ public class BannerController {
 
         try {
             bannerRepository.save(banner);
+            bannersList = mainService.getNotDeletedBanner();
         } catch (Exception e) {
-            //TODO:вывести ошибку
             message = "validation error";
 
         }

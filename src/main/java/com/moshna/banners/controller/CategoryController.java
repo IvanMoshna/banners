@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -47,10 +49,24 @@ public class CategoryController {
     }
 
     @PostMapping("/category")
-    public String categoryPostAdd(@RequestParam String name, @RequestParam String req_name, Model model) {
-        Category category = new Category(name, req_name);
-        categoryRepository.save(category);
-        return "redirect:/";
+    public String categoryPostAdd(@Valid Category category,
+                                  BindingResult bindingResult,
+                                  Model model) {
+        String message ="";
+        List<Category> categoryList = mainService.getNotDeletedCategories();
+
+        try {
+            categoryRepository.save(category);
+            categoryList = mainService.getNotDeletedCategories();
+
+        } catch (Exception e) {
+            message = "validation error";
+
+        }
+        //categoryList = mainService.getNotDeletedCategories();
+        model.addAttribute("categories", categoryList);
+        model.addAttribute("validationMessage", message);
+        return "category-main";
     }
 
     @GetMapping("/category/{id}")
@@ -77,6 +93,8 @@ public class CategoryController {
 
     @PostMapping("/category/{id}/remove")
     public String categoryPostRemove(@PathVariable(value = "id") long id, Model model) {
+
+
         List<Long> notDeletedBannersID = new ArrayList<>();
         Category category = categoryRepository.findById(id).orElseThrow();
 
@@ -89,17 +107,20 @@ public class CategoryController {
             }
         }
 
-        if(!notDeletedBannersID.isEmpty()) {
-            //TODO:ошибка с айдишниками баннеров
-        }
-        else {
+        if(notDeletedBannersID.isEmpty()) {
             category.setDeleted(true);
             categoryRepository.save(category);
+            List<Category> categoryList = mainService.getNotDeletedCategories();
+            model.addAttribute("categories", categoryList);
+            return "category-main";
         }
-
-
-        model.addAttribute("notDeleted", notDeletedBannersID);
-        return "redirect:/category";
+        else {
+            List<Category> categoryList = mainService.getNotDeletedCategories();
+            model.addAttribute("categories", categoryList);
+            model.addAttribute("notDeleted", notDeletedBannersID);
+            model.addAttribute("categoryDetails", category);
+            return "category-details";
+        }
     }
 
     @GetMapping("/category={req_name}")
