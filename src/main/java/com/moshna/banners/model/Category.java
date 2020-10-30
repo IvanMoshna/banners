@@ -25,11 +25,6 @@ public class Category {
         this.deleted = deleted;
     }
 
-    public Category(String name, String req_name) {
-        this.name = name;
-        this.req_name = req_name;
-    }
-
     public Long getId() {
         return id;
     }

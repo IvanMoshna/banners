@@ -5,16 +5,11 @@ import com.moshna.banners.model.Category;
 import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
 import com.moshna.banners.service.MainService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 @Controller
@@ -23,6 +18,11 @@ public class BannerController {
     private final BannerRepository bannerRepository;
     private final CategoryRepository categoryRepository;
     private final MainService mainService;
+
+    public static final String HOME_PAGE = "home";
+    public static final String BANNER_MAIN = "banner-main";
+    public static final String BANNER_DETAILS = "banner-details";
+
 
     public BannerController(BannerRepository bannerRepository,
                             CategoryRepository categoryRepository,
@@ -36,7 +36,7 @@ public class BannerController {
     @GetMapping("/home")
     public String goHome()
     {
-        return "home";
+        return HOME_PAGE;
     }
 
     @GetMapping("/banner")
@@ -47,12 +47,11 @@ public class BannerController {
         String abc = "";
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
-        return "banner-main";
+        return BANNER_MAIN;
     }
 
     @PostMapping("/banner")
     public String bannerPostAdd(@Valid Banner banner,
-                                BindingResult bindingResult,
                                 Model model) {
         List<Banner> bannersList = mainService.getNotDeletedBanner();
         List<Category> categoryList = mainService.getNotDeletedCategories();
@@ -68,13 +67,13 @@ public class BannerController {
         model.addAttribute("banners", bannersList);
         model.addAttribute("categories", categoryList);
         model.addAttribute("validationMessage", message);
-        return "banner-main";
+        return BANNER_MAIN;
     }
 
     @GetMapping("/banner/{id}")
     public String bannerDetails(@PathVariable(value = "id") long id, Model model) {
         if(!bannerRepository.existsById(id)) {
-            return "redirect:/";
+            return HOME_PAGE;
         }
 
         Banner bannerDetail = bannerRepository.findById(id).orElseThrow();
@@ -87,13 +86,13 @@ public class BannerController {
         model.addAttribute("categorySelected", category);
         model.addAttribute("banners", bannersList);
         model.addAttribute("bannerDetails", bannerDetail);
-        return "banner-details";
+        return BANNER_DETAILS;
     }
 
     @PostMapping("/banner/{id}")
     public String bannerPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
                                    @RequestParam double price, @RequestParam Long categoryID,
-                                   @RequestParam String text, Model model) {
+                                   @RequestParam String text) {
         Banner banner = bannerRepository.findById(id).orElseThrow();
         banner.setName(name);
         banner.setPrice(price);
@@ -102,7 +101,7 @@ public class BannerController {
 
         bannerRepository.save(banner);
 
-        return "redirect:/banner";
+        return BANNER_MAIN;
     }
 
     @PostMapping("/banner/{id}/remove")
@@ -110,6 +109,6 @@ public class BannerController {
         Banner banner = bannerRepository.findById(id).orElseThrow();
         banner.setDeleted(true);
         bannerRepository.save(banner);
-        return "redirect:/banner";
+        return BANNER_MAIN;
     }
 }

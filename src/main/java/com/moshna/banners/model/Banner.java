@@ -36,12 +36,6 @@ public class Banner {
         this.deleted = deleted;
     }
 
-    public Banner(String name, double price, Long categoryID, String text) {
-        this.name = name;
-        this.price = price;
-        this.categoryID = categoryID;
-        this.text = text;
-    }
 
     public Long getId() {
         return id;

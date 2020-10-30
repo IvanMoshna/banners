@@ -7,18 +7,13 @@ import com.moshna.banners.repo.BannerRepository;
 import com.moshna.banners.repo.CategoryRepository;
 import com.moshna.banners.repo.RequestRepository;
 import com.moshna.banners.service.MainService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
-import java.text.SimpleDateFormat;
+import javax.validation.Valid;;
 import java.util.*;
 
 @Controller
@@ -29,7 +24,11 @@ public class CategoryController {
     private RequestRepository requestRepository;
     private MainService mainService;
 
-    SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
+    public static final String HOME_PAGE = "home";
+    public static final String CATEGORY_MAIN = "category-main";
+    public static final String CATEGORY_DETAILS = "category-details";
+    public static final String BANNER_TEXT = "bannerText";
+
 
     public CategoryController(CategoryRepository categoryRepository,
                               BannerRepository bannerRepository,
@@ -45,12 +44,11 @@ public class CategoryController {
     public String categoryMain(Model model) {
         List<Category> categoryList = mainService.getNotDeletedCategories();
         model.addAttribute("categories", categoryList);
-        return "category-main";
+        return CATEGORY_MAIN;
     }
 
     @PostMapping("/category")
     public String categoryPostAdd(@Valid Category category,
-                                  BindingResult bindingResult,
                                   Model model) {
         String message ="";
         List<Category> categoryList = mainService.getNotDeletedCategories();
@@ -63,10 +61,9 @@ public class CategoryController {
             message = "validation error";
 
         }
-        //categoryList = mainService.getNotDeletedCategories();
         model.addAttribute("categories", categoryList);
         model.addAttribute("validationMessage", message);
-        return "category-main";
+        return CATEGORY_MAIN;
     }
 
     @GetMapping("/category/{id}")
@@ -76,19 +73,19 @@ public class CategoryController {
 
         model.addAttribute("categories", categoryList);
         model.addAttribute("categoryDetails", category);
-        return "category-details";
+        return CATEGORY_DETAILS;
     }
 
     @PostMapping("/category/{id}")
     public String categoryPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
-                                     @RequestParam String req_name, Model model) {
+                                     @RequestParam String req_name) {
         Category category = categoryRepository.findById(id).orElseThrow();
         category.setName(name);
         category.setReq_name(req_name);
 
         categoryRepository.save(category);
 
-        return "redirect:/category";
+        return CATEGORY_MAIN;
     }
 
     @PostMapping("/category/{id}/remove")
@@ -100,7 +97,6 @@ public class CategoryController {
 
 
         Iterable<Banner> banners = bannerRepository.findAll();
-        Collection<Banner> bannersList = new ArrayList<>();
         for (Banner b: banners) {
             if(b.getCategoryID() == id && !b.isDeleted()) {
                 notDeletedBannersID.add(b.getId());
@@ -112,14 +108,14 @@ public class CategoryController {
             categoryRepository.save(category);
             List<Category> categoryList = mainService.getNotDeletedCategories();
             model.addAttribute("categories", categoryList);
-            return "category-main";
+            return CATEGORY_MAIN;
         }
         else {
             List<Category> categoryList = mainService.getNotDeletedCategories();
             model.addAttribute("categories", categoryList);
             model.addAttribute("notDeleted", notDeletedBannersID);
             model.addAttribute("categoryDetails", category);
-            return "category-details";
+            return CATEGORY_DETAILS;
         }
     }
 
@@ -138,34 +134,15 @@ public class CategoryController {
 
 
         for (Category c: categories) {
-            String nameReq = c.getReq_name();
             if(c.getReq_name().equals(req_name)) {
                 for (Banner b: banners) {
                     if(b.getCategoryID() == c.getId()){
-                        bannersWithCatID.add(b);//баннеры с выбранной категорией
+                        bannersWithCatID.add(b);
                     }
                 }
             }
         }
 
-        //ищем с максимальным прайсом
-        /*if(!bannersWithCatID.isEmpty()) {
-
-            Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
-            if(!requests.isEmpty()) {
-                for (Request r: requests) {
-                    Date dateNow = new Date(System.currentTimeMillis());
-                    Long milliseconds = r.getDateTime().getTime() - dateNow.getTime();
-                    int days = (int) (milliseconds / (24 * 60 * 60 * 1000));
-                    if(r.getBanner_Id() == bannerWithMaxPrice.getId() &&
-                    r.getUser_agent().equals(userAgent) &&
-                    r.getIp_address() == requestIP.getRemoteAddr() &&
-                    days>=1) {
-                        bannersWithCatID.remove(bannerWithMaxPrice);
-
-                    }
-                }
-            }*/
         if(check(bannersWithCatID, requests, userAgent, requestIP) && !bannersWithCatID.isEmpty()) {
 
             Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
@@ -177,11 +154,11 @@ public class CategoryController {
             requestRepository.save(request);
 
             model.addAttribute("bannerText", soughtBannerText);
-            return "bannerText";
+            return BANNER_TEXT;
         }
         else {
             response.setStatus(204);
-            return "category-main";
+            return CATEGORY_MAIN;
         }
 
 
@@ -200,9 +177,7 @@ public class CategoryController {
 
     public boolean check(List<Banner> bannersWithCatID, List<Request> requests,
                          String userAgent, HttpServletRequest requestIP ) {
-        //boolean isOk;
         if (!bannersWithCatID.isEmpty()) {
-
 
             if (!requests.isEmpty()) {
                 for (Request r : requests) {
@@ -223,10 +198,8 @@ public class CategoryController {
                 }
             }
             return true;
-        }
-       else{
+        } else{
            return  false;
         }
-
     }
 }
