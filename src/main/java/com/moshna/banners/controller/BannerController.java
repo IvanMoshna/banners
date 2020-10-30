@@ -92,7 +92,7 @@ public class BannerController {
     @PostMapping("/banner/{id}")
     public String bannerPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
                                    @RequestParam double price, @RequestParam Long categoryID,
-                                   @RequestParam String text) {
+                                   @RequestParam String text, Model model) {
         Banner banner = bannerRepository.findById(id).orElseThrow();
         banner.setName(name);
         banner.setPrice(price);
@@ -101,6 +101,10 @@ public class BannerController {
 
         bannerRepository.save(banner);
 
+        List<Banner> bannersList = mainService.getNotDeletedBanner();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
+        model.addAttribute("categories", categoryList);
+        model.addAttribute("banners", bannersList);
         return BANNER_MAIN;
     }
 

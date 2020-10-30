@@ -136,21 +136,22 @@ public class CategoryController {
         for (Category c: categories) {
             if(c.getReq_name().equals(req_name)) {
                 for (Banner b: banners) {
-                    if(b.getCategoryID() == c.getId()){
-                        bannersWithCatID.add(b);
+                    if(b.getCategoryID().equals(c.getId())){
+                        bannersWithCatID.add(b);//баннеры с выбранной категорией
                     }
                 }
             }
         }
 
-        if(check(bannersWithCatID, requests, userAgent, requestIP) && !bannersWithCatID.isEmpty()) {
+        if(requests.isEmpty() && !bannersWithCatID.isEmpty() ||
+                check(bannersWithCatID, requests, userAgent, requestIP) ){
 
             Banner bannerWithMaxPrice = getBannerWithMaxPrice(bannersWithCatID);
             soughtBannerText = bannerWithMaxPrice.getText();
 
             Date date = new Date(System.currentTimeMillis());
             Request request = new Request(bannerWithMaxPrice.getId(), userAgent,
-                                            requestIP.getRemoteAddr(), date);
+                    requestIP.getRemoteAddr(), date);
             requestRepository.save(request);
 
             model.addAttribute("bannerText", soughtBannerText);
@@ -185,20 +186,22 @@ public class CategoryController {
                     Date dateNow = new Date(System.currentTimeMillis());
                     Long milliseconds = dateNow.getTime() - r.getDateTime().getTime();
                     int days = (int) (milliseconds / (24 * 60 * 60 * 1000));
-                    if (r.getBanner_Id() == bannerWithMaxPrice.getId() &&
+                    if (r.getBanner_Id().equals(bannerWithMaxPrice.getId()) &&
                             r.getUser_agent().equals(userAgent) &&
                             r.getIp_address().equals(requestIP.getRemoteAddr()) &&
                             days < 1) {
                         bannersWithCatID.remove(bannerWithMaxPrice);
-                        continue;
+                        if(bannersWithCatID.isEmpty()){
+                            return false;
+                        }
+
                     }
-                    else {
-                        continue;
-                    }
+                    continue;
                 }
             }
             return true;
-        } else{
+        }
+        else{
            return  false;
         }
     }

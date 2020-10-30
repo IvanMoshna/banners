@@ -56,7 +56,9 @@
             <input type="double" name="price" th:value="${bannerDetails.getPrice()}" class="form-control" required><br>
             <div class="form-group blu-margin">
                 <select name="categoryID" class="form-control" required>
-                    <option th:text="${categorySelected.name}"></option>
+                    <option th:text="${categorySelected.name}"
+                            th:value="${categorySelected.id}"
+                    ></option>
                     <option th:each="category : ${categories}"
                             th:value="${category.id}"
                             th:text="${category.name}">
