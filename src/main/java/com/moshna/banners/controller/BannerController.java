@@ -44,7 +44,7 @@ public class BannerController {
 
         List<Banner> bannersList = mainService.getNotDeletedBanner();
         List<Category> categoryList = mainService.getNotDeletedCategories();
-        String abc = "";
+
         model.addAttribute("categories", categoryList);
         model.addAttribute("banners", bannersList);
         return BANNER_MAIN;
@@ -113,6 +113,10 @@ public class BannerController {
         Banner banner = bannerRepository.findById(id).orElseThrow();
         banner.setDeleted(true);
         bannerRepository.save(banner);
+        List<Banner> bannersList = mainService.getNotDeletedBanner();
+        List<Category> categoryList = mainService.getNotDeletedCategories();
+        model.addAttribute("categories", categoryList);
+        model.addAttribute("banners", bannersList);
         return BANNER_MAIN;
     }
 }

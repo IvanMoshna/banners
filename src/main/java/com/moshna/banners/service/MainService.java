@@ -27,26 +27,39 @@ public class MainService {
     }
 
     public List<Banner> getNotDeletedBanner() {
-        Iterable<Banner> banners = bannerRepository.findAll();
-        List<Banner> bannersList = new ArrayList<>();
-        for (Banner b : banners) {
-            if(!b.isDeleted()) {
-                bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                        b.getCategoryID(), b.getText(), b.isDeleted()));
+        try {
+            Iterable<Banner> banners = bannerRepository.findAll();
+            List<Banner> bannersList = new ArrayList<>();
+            for (Banner b : banners) {
+                if (!b.isDeleted()) {
+                    bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
+                            b.getCategoryID(), b.getText(), b.isDeleted()));
+                }
             }
+            return bannersList;
         }
-        return bannersList;
+        catch (Exception e)
+        {
+            return null;
+        }
+        //return bannersList;
     }
 
     public List<Category> getNotDeletedCategories() {
-        Iterable<Category> categories = categoryRepository.findAll();
-        List<Category> categoriesList = new ArrayList<>();
-        for (Category b : categories) {
-            if(!b.isDeleted()) {
-                categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+        try {
+            Iterable<Category> categories = categoryRepository.findAll();
+            List<Category> categoriesList = new ArrayList<>();
+            for (Category b : categories) {
+                if(!b.isDeleted()) {
+                    categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+                }
             }
+            return categoriesList;
         }
-        return categoriesList;
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     public List<Request> getAllRequest() {

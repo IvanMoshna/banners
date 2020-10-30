@@ -78,14 +78,17 @@ public class CategoryController {
 
     @PostMapping("/category/{id}")
     public String categoryPostUpdate(@PathVariable(value = "id") long id, @RequestParam String name,
-                                     @RequestParam String req_name) {
+                                     @RequestParam String req_name, Model model) {
         Category category = categoryRepository.findById(id).orElseThrow();
         category.setName(name);
         category.setReq_name(req_name);
 
         categoryRepository.save(category);
+        List<Category> categoryList = mainService.getNotDeletedCategories();
 
-        return CATEGORY_MAIN;
+        model.addAttribute("categories", categoryList);
+
+        return HOME_PAGE;
     }
 
     @PostMapping("/category/{id}/remove")
