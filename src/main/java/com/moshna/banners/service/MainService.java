@@ -9,6 +9,7 @@ import com.moshna.banners.repo.RequestRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,35 +31,33 @@ public class MainService {
         try {
             Iterable<Banner> banners = bannerRepository.findAll();
             List<Banner> bannersList = new ArrayList<>();
-            for (Banner b : banners) {
-                if (!b.isDeleted()) {
-                    bannersList.add(new Banner(b.getId(), b.getName(), b.getPrice(),
-                            b.getCategoryID(), b.getText(), b.isDeleted()));
+            banners.forEach(banner -> {
+                if(!banner.isDeleted()) {
+                    bannersList.add(banner);
                 }
-            }
+            });
             return bannersList;
         }
         catch (Exception e)
         {
-            return null;
+            return Collections.emptyList();
         }
-        //return bannersList;
     }
 
     public List<Category> getNotDeletedCategories() {
         try {
             Iterable<Category> categories = categoryRepository.findAll();
             List<Category> categoriesList = new ArrayList<>();
-            for (Category b : categories) {
-                if(!b.isDeleted()) {
-                    categoriesList.add(new Category(b.getId(), b.getName(), b.getReq_name(), b.isDeleted()));
+            categories.forEach(category -> {
+                if(!category.isDeleted()) {
+                    categoriesList.add(category);
                 }
-            }
+            });
             return categoriesList;
         }
         catch (Exception e)
         {
-            return null;
+            return Collections.emptyList();
         }
     }
 

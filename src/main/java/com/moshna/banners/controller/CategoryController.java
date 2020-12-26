@@ -68,7 +68,7 @@ public class CategoryController {
 
     @GetMapping("/category/{id}")
     public String categoryDetails(@PathVariable(value = "id") long id, Model model) {
-        Category category = categoryRepository.findById(id).orElseThrow();
+        Category category = categoryRepository.findById(id).orElseThrow(IllegalArgumentException::new);
         List<Category> categoryList = mainService.getNotDeletedCategories();
 
         model.addAttribute("categories", categoryList);
