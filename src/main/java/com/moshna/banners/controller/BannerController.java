@@ -18,6 +18,7 @@ public class BannerController {
     private final BannerRepository bannerRepository;
     private final CategoryRepository categoryRepository;
     private final MainService mainService;
+    private ExceptionController exceptionController;
 
     public static final String HOME_PAGE = "home";
     public static final String BANNER_MAIN = "banner-main";
@@ -26,10 +27,12 @@ public class BannerController {
 
     public BannerController(BannerRepository bannerRepository,
                             CategoryRepository categoryRepository,
-                            MainService mainService) {
+                            MainService mainService,
+                            ExceptionController exceptionController) {
         this.bannerRepository = bannerRepository;
         this.categoryRepository = categoryRepository;
         this.mainService = mainService;
+        this.exceptionController = exceptionController;
     }
 
 
@@ -61,12 +64,13 @@ public class BannerController {
             bannerRepository.save(banner);
             bannersList = mainService.getNotDeletedBanner();
         } catch (Exception e) {
-            message = "validation error";
+            //message = "validation error";
+            exceptionController.handleArgumentNotValidException(e, model);
 
         }
         model.addAttribute("banners", bannersList);
         model.addAttribute("categories", categoryList);
-        model.addAttribute("validationMessage", message);
+        //model.addAttribute("validationMessage", message);
         return BANNER_MAIN;
     }
 
